@@ -1,12 +1,5 @@
-
-
-# Standard library imports
 from typing import List, Tuple
-
-# Third-party imports
 from pandas.tseries.frequencies import to_offset
-
-
 def _make_block_diagonal(blocks: List[Tensor]) -> Tensor:
     assert (
         len(blocks) > 0
@@ -16,8 +9,6 @@ def _make_block_diagonal(blocks: List[Tensor]) -> Tensor:
         return blocks[0]
 
     F = getF(blocks[0])
-
-    # transition coefficient is block diagonal!
     block_diagonal = _make_2_block_diagonal(F, blocks[0], blocks[1])
     for i in range(2, len(blocks)):
         block_diagonal = _make_2_block_diagonal(
@@ -25,13 +16,8 @@ def _make_block_diagonal(blocks: List[Tensor]) -> Tensor:
         )
 
     return block_diagonal
-
-
 def _make_2_block_diagonal(F, left: Tensor, right: Tensor) -> Tensor:
     """
-    Creates a block diagonal matrix of shape (batch_size, m+n, m+n) where m and n are the sizes of
-    the axis 1 of left and right respectively.
-
     Parameters
     ----------
     F
@@ -68,17 +54,13 @@ def _make_2_block_diagonal(F, left: Tensor, right: Tensor) -> Tensor:
 
 
 class ISSM:
-    r"""
-    An abstract class for providing the basic structure of Innovation State Space Model (ISSM).
-
+    """
     The structure of ISSM is given by
-
         * dimension of the latent state
         * transition and emission coefficents of the transition model
         * emission coefficient of the observation model
 
     """
-
     @validated()
     def __init__(self):
         pass
@@ -106,8 +88,6 @@ class ISSM:
             self.transition_coeff(seasonal_indicators),
             self.innovation_coeff(seasonal_indicators),
         )
-
-
 class LevelISSM(ISSM):
     def latent_dim(self) -> int:
         return 1
@@ -162,7 +142,6 @@ class LevelISSM(ISSM):
     ) -> Tensor:
         return self.emission_coeff(seasonal_indicators).squeeze(axis=2)
 
-
 class LevelTrendISSM(LevelISSM):
     def latent_dim(self) -> int:
         return 2
@@ -180,8 +159,6 @@ class LevelTrendISSM(LevelISSM):
             .expand_dims(axis=0)
             .expand_dims(axis=0)
         )
-
-        # get the right shape: (batch_size, seq_length, latent_dim, latent_dim)
         zeros = _broadcast_param(
             F.zeros_like(
                 seasonal_indicators.slice_axis(
@@ -193,8 +170,6 @@ class LevelTrendISSM(LevelISSM):
         )
 
         return _transition_coeff.broadcast_like(zeros)
-
-
 class SeasonalityISSM(LevelISSM):
     """
     Implements periodic seasonality which is entirely determined by the period `num_seasons`.
@@ -221,8 +196,6 @@ class SeasonalityISSM(LevelISSM):
         return F.one_hot(seasonal_indicators, depth=self.latent_dim()).squeeze(
             axis=2
         )
-
-
 class CompositeISSM(ISSM):
     DEFAULT_ADD_TREND: bool = True
 
@@ -322,7 +295,6 @@ class CompositeISSM(ISSM):
                 for ix, issm in enumerate(self.seasonal_issms)
             ],
         )
-
         # stack emission and innovation coefficients
         emission_coeff = F.concat(*emission_coeff_ls, dim=-1)
 

@@ -1,10 +1,8 @@
 class StateNeuronPredictionNetwork:
-
     @validated()
     def __init__(self, num_parallel_samples: int, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.num_parallel_samples = num_parallel_samples
-
     def hybrid_forward(
         self,
         F,
@@ -41,7 +39,6 @@ class StateNeuronPredictionNetwork:
             observed=observed_context.min(axis=-1, keepdims=False),
             scale=scale,
         )
-
         lds_prediction, _ = self.compute_lds(
             F,
             feat_static_cat=feat_static_cat,
@@ -52,16 +49,9 @@ class StateNeuronPredictionNetwork:
             prior_mean=final_mean,
             prior_cov=final_cov,
         )
-
         samples = lds_prediction.sample(
             num_samples=self.num_parallel_samples, scale=scale
         )
-
-        # convert samples from
-        # (num_samples, batch_size, prediction_length, target_dim)
-        # to
-        # (batch_size, num_samples, prediction_length, target_dim)
-        # and squeeze last axis in the univariate case
         if self.univariate:
             return samples.transpose(axes=(1, 0, 2, 3)).squeeze(axis=3)
         else:

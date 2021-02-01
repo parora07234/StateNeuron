@@ -1,19 +1,15 @@
-
 from typing import List, Optional
-
-# Standard library imports
 import numpy as np
-
-
+import mxnet as mx
+import pandas as pd
+import matplotlib.pyplot as plt
+import json
+import os
+from itertools import islice
+from pathlib import Path
 from pandas.tseries.frequencies import to_offset
 
-
 SEASON_INDICATORS_FIELD = "seasonal_indicators"
-
-
-# A dictionary mapping granularity to the period length of the longest season
-# one can expect given the granularity of the time series.
-
 FREQ_LONGEST_PERIOD_DICT = {
     "M": 12,  # yearly seasonality
     "W-SUN": 52,  # yearly seasonality
@@ -23,12 +19,9 @@ FREQ_LONGEST_PERIOD_DICT = {
     "T": 1440,  # daily seasonality
 }
 
-
 def longest_period_from_frequency_str(freq_str: str) -> int:
     offset = to_offset(freq_str)
     return FREQ_LONGEST_PERIOD_DICT[offset.name] // offset.n
-
-
 class StateNeuronEstimator:
     """
     Parameters
@@ -59,8 +52,6 @@ class StateNeuronEstimator:
         Number of periods to include in the training time series. (default: 4)
         Here period corresponds to the longest cycle one can expect given 
         the granularity of the time series.
-        See: https://stats.stackexchange.com/questions/120806/frequency
-        -value-for-seconds-minutes-intervals-data-in-r
     trainer
         Trainer object to be used (default: Trainer())
     num_layers
@@ -73,8 +64,6 @@ class StateNeuronEstimator:
     num_parallel_samples
         Number of evaluation samples per time series to increase parallelism 
         during inference.
-        This is a model optimization that does not affect the accuracy (
-        default: 100).
     dropout_rate
         Dropout regularization parameter (default: 0.1)
     use_feat_dynamic_real
@@ -100,7 +89,6 @@ class StateNeuronEstimator:
         Lower and upper bounds for the standard deviation of the observation 
         noise
     """
-
     @validated()
     def __init__(
         self,
@@ -195,7 +183,3 @@ class StateNeuronEstimator:
         self.noise_std_bounds = noise_std_bounds
         self.prior_cov_bounds = prior_cov_bounds
         self.innovation_bounds = innovation_bounds
-
-
-
-
