@@ -1,12 +1,5 @@
-
-
-# Standard library imports
 from typing import List, Optional
-
-# Third-party imports
 import mxnet as mx
-
-
 class StateNeuronNetwork:
     @validated()
     def __init__(
@@ -46,9 +39,7 @@ class StateNeuronNetwork:
 
         self.noise_std_bounds = noise_std_bounds
         self.prior_cov_bounds = prior_cov_bounds
-        self.innovation_bounds = innovation_bounds
-
- 
+        self.innovation_bounds = innovation_bounds 
     def compute_lds(
         self,
         F,
@@ -59,8 +50,7 @@ class StateNeuronNetwork:
         prior_mean: Optional[Tensor] = None,
         prior_cov: Optional[Tensor] = None,
         lstm_begin_state: Optional[List[Tensor]] = None,
-    ):
-        
+    ):       
     lds = LDS(
             emission_coeff=emission_coeff,
             transition_coeff=transition_coeff,
@@ -75,11 +65,7 @@ class StateNeuronNetwork:
         )
 
         return lds, lstm_final_state
-
-
-class StateNeuronTrainingNetwork:
-
-    # noinspection PyMethodOverriding,PyPep8Naming
+class StateNeuronTrainingNetwork: 
     def hybrid_forward(
         self,
         F,
@@ -118,5 +104,3 @@ class StateNeuronTrainingNetwork:
         return weighted_average(
             F=F, x=-ll, axis=1, weights=observed_context.squeeze(axis=-1)
         )
-
-
