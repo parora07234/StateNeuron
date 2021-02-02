@@ -44,7 +44,7 @@ class StateNeuronEstimator:
         past_length: Optional[int] = None,
         num_periods_to_train: int = 4,
         trainer: Trainer = Trainer(
-            epochs=100, num_batches_per_epoch=50, hybridize=False
+            epochs=1, num_batches_per_epoch=50, hybridize=False
         ),
         num_layers: int = 2,
         num_cells: int = 40,
@@ -54,9 +54,9 @@ class StateNeuronEstimator:
         use_feat_dynamic_real: bool = False,
         use_feat_static_cat: bool = True,
         embedding_dimension: Optional[List[int]] = None,
-        issm: Optional[ISSM] = None,
+        issm: Optional[ISSM] = [CompositeISSM],
         scaling: bool = True,
-        time_features: Optional[List[TimeFeature]] = None,
+        time_features: Optional[List[TimeFeature]] = [HourOfDay],
         noise_std_bounds: ParameterBounds = ParameterBounds(1e-6, 1.0),
         prior_cov_bounds: ParameterBounds = ParameterBounds(1e-6, 1.0),
         innovation_bounds: ParameterBounds = ParameterBounds(1e-6, 0.01),
@@ -119,7 +119,7 @@ estimator=StateNeuronEstimator (freq='H',
         use_feat_dynamic_real = True,
         use_feat_static_cat = True,
         embedding_dimension = None,
-        issm =None ,
+        issm =[CompositeISSM] ,
         scaling = True,
         time_features = [HourOfDay])
 
